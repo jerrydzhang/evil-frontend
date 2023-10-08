@@ -4,12 +4,74 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { CartItem, Product } from "../common/types";
 
 export function Cart() {
-    const {user, isAuthenticated } = useAuth0();
+    const {user, isAuthenticated, isLoading} = useAuth0();
     const [cart, setCart] = React.useState([]);
     const [cartDict, setCartDict] = React.useState(JSON.parse(localStorage.getItem("cart") || "{}"));
-    const [accessToken, setAccessToken] = React.useState<string | undefined>();
 
     React.useEffect(() => {
+        // get ids from localStorage
+        const ids = Object.keys(cartDict);
+
+        // if no ids, return
+        if (ids.length === 0) { 
+            return;
+        }
+
+        // get products from backend
+        rerenderCart();
+    }, []);
+
+    React.useEffect(() => {
+        if (isAuthenticated) {
+            Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/cart/cart?user=${user?.sub}`)
+            .then((res) => {
+                console.log(res);
+                // if their cart is empty, update it with localStorage
+                if (res.data.length === 0) {
+                    Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
+                        user_id: user?.sub,
+                        cart: JSON.parse(localStorage.getItem("cart") || "{}")
+                    })
+                    .then((res) => {
+                        console.log(res);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+                } else {
+                    // if their cart is not empty, update localStorage with backend
+                    let cartDict = Object.fromEntries(res.data.map((cartItem: CartItem) => [cartItem.product_id, cartItem.quantity]))   
+                    localStorage.setItem("cart", JSON.stringify(cartDict));
+                    setCartDict(cartDict);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+
+        }
+    }, [isLoading])
+
+    React.useEffect(() => {
+        if (!isAuthenticated) {
+            return;
+        }
+
+        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
+            user_id: user?.sub,
+            cart: JSON.parse(localStorage.getItem("cart") || "{}")
+        })
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+
+        rerenderCart();
+    }, [cartDict]);
+
+    const rerenderCart = () => {
         // get ids from localStorage
         const ids = Object.keys(cartDict);
 
@@ -27,24 +89,7 @@ export function Cart() {
         .catch((err) => {
             console.log(err);
         });
-    }, [isAuthenticated]);
-
-    React.useEffect(() => {
-        if (!isAuthenticated) {
-            return;
-        }
-
-        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
-            user_id: user?.sub,
-            cart: JSON.parse(localStorage.getItem("cart") || "{}")
-        })
-        .then((res) => {
-            console.log(res);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    }, [cartDict]);
+    }
 
     const removeFromCart = (event: any) => {
         // remove product from localStorage
