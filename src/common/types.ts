@@ -9,6 +9,11 @@ export interface Product {
     last_updated: string;
 }
 
+export interface Catagory {
+    id: number;
+    name: string;
+}
+
 export interface CartItem {
     id: number;
     user_id: string;

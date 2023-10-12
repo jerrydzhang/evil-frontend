@@ -1,8 +1,8 @@
 import React from "react";  
 import { useAuth0 } from "@auth0/auth0-react";
 
-import LoginButton from "./components/loginbutton";
-import LogoutButton from "./components/logoutbutton";
+import LoginButton from "./components/LoginButton";
+import LogoutButton from "./components/LogoutButton";
 
 export function Header() {
     const { isAuthenticated } = useAuth0();
@@ -13,7 +13,7 @@ export function Header() {
             <a href="/">PLACEHOLDER</a>
         </div>
         <div>
-            <a href="/shop">Shop</a>
+            <a href="/products">Shop</a>
             <a href="/about">About</a>
             <a href="/cart">Cart</a>
             <input type="text" placeholder="Search"></input>

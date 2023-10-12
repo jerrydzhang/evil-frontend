@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
-import { useAuth0 } from "@auth0/auth0-react";
+import Axios from 'axios';
+import { useAuth0, IdToken } from "@auth0/auth0-react";
 
 export function Profile() {
     const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
-    const [accessToken, setAccessToken] = useState<string | undefined>();
+    const backendUrl = process.env.REACT_APP_BACKEND_URL!;
 
-    if (isAuthenticated) {
-        getAccessTokenSilently().then((token) => {
-            setAccessToken(token);
-        });
-    }
+    const getCookie = async () => {
+        const accessToken = await getAccessTokenSilently();
+        Axios.post(`${backendUrl}/api/user/login`, {
+            id: user!.sub,
+            email: user!.email,
+        }, 
+        { headers: { Authorization: `Bearer ${accessToken}` }, withCredentials: true })
+        .then((res) => {
+            console.log(res);
+        })
+        .catch((err) => {
+            console.log(err);
+        });            
+    };
 
     if (isLoading) {
         return <div>Loading ...</div>;
@@ -23,7 +33,7 @@ export function Profile() {
                     <p>{user!.email}</p>
                     <p>{user!.nickname}</p>
                     <p>{user!.sub}</p>
-                    <p>{accessToken}</p>
+                    <button onClick={getCookie}>Get Cookie</button>
                 </div>
             ):(
                 <div>

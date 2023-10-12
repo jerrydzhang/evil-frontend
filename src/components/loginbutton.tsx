@@ -4,9 +4,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const LoginButton = () => {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    const { user, loginWithRedirect, isLoading } = useAuth0();
+    const { loginWithRedirect } = useAuth0();
 
     const loginHandler = async () => {
+
         loginWithRedirect();
     }
 

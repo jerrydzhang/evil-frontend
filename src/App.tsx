@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Route,
   Routes,
+  useLocation,
 } from 'react-router-dom';
 import Axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -13,30 +14,35 @@ import { About } from './pages/About';
 import { Shop } from './pages/Shop';
 import { Cart } from './pages/Cart';
 import { Profile } from './pages/Profile';
-import { CartItem } from './common/types';
-import { SingleProduct } from './pages/Singleproduct';
+import { SingleProduct } from './pages/SingleProduct';
+import { EditSingleProduct } from './pages/EditSingleProduct';
+import { Authenticate } from './pages/Authenticate';
+import { CreateProduct } from './pages/CreateProduct';
 
 
 function App() {
-  
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const location = useLocation();
 
-  if (isAuthenticated) {
-    getAccessTokenSilently().then((token) => {
-        Axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    });
-  }
+  // Define an array of routes where the header should be hidden
+  const hiddenRoutes = ['/authenticate'];
+
+  // Check if the current route is in the hiddenRoutes array
+  const isHeaderHidden = hiddenRoutes.includes(location.pathname);
 
   return (
     <div className="App">
-      <Header/>
+      {/* Conditionally render the Header component */}
+      {!isHeaderHidden && <Header/>}
       <Routes>
         <Route path="/" element={<Home/>} />
         <Route path="/about" element={<About/>} />
-        <Route path="/shop" element={<Shop/>} />
+        <Route path="/products" element={<Shop/>} />
+        <Route path="/products/:id" element={<SingleProduct/>} />
+        <Route path="/products/:id/edit" element={<EditSingleProduct/>} />
+        <Route path="/products/create" element={<CreateProduct/>} />
         <Route path="/cart" element={<Cart/>} />
         <Route path="/profile" element={<Profile/>} />
-        <Route path="/product/:id" element={<SingleProduct/>} />
+        <Route path="/authenticate" element={<Authenticate/>} />
         <Route path="*" element={<div>404</div>} />
       </Routes>
     </div>

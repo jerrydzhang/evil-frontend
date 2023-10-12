@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export function Shop() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL!;
     const { user, isAuthenticated } = useAuth0();
-    const [products, setProducts] = React.useState([]);
+    const [products, setProducts] = useState([]);
+    const [isEditing, setIsEditing] = useState(false);
 
     React.useEffect(() => {
         Axios.get(`${backendUrl}/api/product/products`)
@@ -61,9 +62,18 @@ export function Shop() {
     return (
         <div>
             <h1>Shop</h1>
+            <input type="checkbox" checked={isEditing} onChange={() => setIsEditing(!isEditing)} />
+            {isEditing && (
+                <a href="/products/create">Create Product</a>
+            )}
             {products.map((product: any) => (
                 <div key={product.id}>
-                    <h3>{product.name}</h3>
+                    {isEditing ? (
+                    <a href={`/products/${product.id}/edit`}>{product.name}</a>
+                    ):(
+                    <a href={`/products/${product.id}`}>{product.name}</a>
+                    )}
+                    <p>{product.catagory}</p>
                     <p>{product.price}</p>
                     <p>{product.description}</p>
                     <button data-id={product.id} onClick={addToCart}>Add To Cart</button>
