@@ -5,7 +5,7 @@ import LoginButton from "./components/LoginButton";
 import LogoutButton from "./components/LogoutButton";
 
 export function Header() {
-    const { isAuthenticated } = useAuth0();
+    const { isAuthenticated, user } = useAuth0();
 
     return (
       <div>
@@ -20,6 +20,7 @@ export function Header() {
             {(isAuthenticated) ? (
                 <div>
                     <a href="/profile">profile</a>
+                    <img src={user?.picture} alt={user?.name} />
                     <LogoutButton />
                 </div>
             ):(
