@@ -38,7 +38,7 @@ function App() {
         <Route path="/about" element={<About/>} />
         <Route path="/products" element={<Shop/>} />
         <Route path="/products/:id" element={<SingleProduct/>} />
-        <Route element={<ProtectedRoute/>}>
+        <Route element={<ProtectedRoute roles={["admin"]}/>}>
           <Route path="/products/:id/edit" element={<EditSingleProduct/>} />
           <Route path="/products/create" element={<CreateProduct/>} />
         </Route>

@@ -1,3 +1,9 @@
+export interface User {
+    id: string;
+    email: string;
+    roles: string[];
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -20,3 +26,4 @@ export interface CartItem {
     product_id: number;
     quantity: number;
 }
+
