@@ -20,6 +20,7 @@ import { SingleProduct } from './pages/SingleProduct';
 import { EditSingleProduct } from './pages/EditSingleProduct';
 import { Authenticate } from './pages/Authenticate';
 import { CreateProduct } from './pages/CreateProduct';
+import { CheckoutApproved } from './pages/CheckoutApproved';
 
 function App() {
   const location = useLocation();
@@ -45,6 +46,7 @@ function App() {
         <Route path="/cart" element={<Cart/>} />
         <Route path="/profile" element={<Profile/>} />
         <Route path="/authenticate" element={<Authenticate/>} />
+        <Route path="/checkout-approved" element={<CheckoutApproved/>} />
         <Route path="*" element={<div>404</div>} />
       </Routes>
     </div>

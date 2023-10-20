@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Axios from "axios";
+
 import { Catagory } from "../common/types";
+import UploadAndDisplayImage from "../components/UploadAndDisplayImage";
 
 
 export function CreateProduct() {
@@ -20,8 +22,9 @@ export function CreateProduct() {
         inventory: Number,
     }
 
+    // on first render, get catagories from backend
     React.useEffect(() => {
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/catagory/catagories`)
+        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/catagory`)
         .then((res) => {
             console.log(res);
             setCatagories(res.data);
@@ -32,19 +35,25 @@ export function CreateProduct() {
         });
     }, []);
 
+    // update product state
     const updateProduct = (event: any) => {
         const field = event.target.dataset.field;
         let value = event.target.value;
-        // if price, convert to float
-        if (field === "catagory_id") {
+        // if price or inventory, convert to float
+        if (field === "catagory_id" || field === "inventory") {
             value = parseFloat(value);
+        }
+        if (field === "images") {
+            value = value.split(",");
+            value = [...value];
         }
         const newProduct = {...product, [field]: value};
         setProduct(newProduct);
     };
 
+    // create product
     const createProduct = () => {
-        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/product/create_product`, 
+        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/product/create`, 
         product, 
         { withCredentials: true })
         .then((res) => {
@@ -65,6 +74,8 @@ export function CreateProduct() {
                 ))}
             </select>
             <input data-field="description" type="text" onChange={updateProduct} placeholder="description" />
+            <input data-field="inventory" type="number" onChange={updateProduct} placeholder="inventory" />
+            <input data-field="images" type="text" onChange={updateProduct} placeholder="images" />
             <button onClick={createProduct}>Create Product</button>
         </div>
     );

@@ -9,7 +9,7 @@ export function Shop() {
     const [isEditing, setIsEditing] = useState(false);
 
     React.useEffect(() => {
-        Axios.get(`${backendUrl}/api/product/products`)
+        Axios.get(`${backendUrl}/api/product`)
             .then((res) => {
                 console.log(res);
                 setProducts(res.data);
@@ -27,11 +27,11 @@ export function Shop() {
             cartDict[productId] = cartDict[productId] + 1 || 1;
             localStorage.setItem("cart", JSON.stringify(cartDict));
             if (isAuthenticated) {
-                Axios.post(`${backendUrl}/api/cart/update_cart_item`, {
+                Axios.post(`${backendUrl}/api/cart/update`, {
                     user_id: user?.sub,
-                    product_id: JSON.parse(productId),
+                    product_id: productId,
                     quantity: cartDict[productId]
-                })
+                }, { withCredentials: true})
                 .then((res) => {
                     console.log(res);
                 })
@@ -44,11 +44,11 @@ export function Shop() {
             cartDict[productId] = 1;
             localStorage.setItem("cart", JSON.stringify(cartDict));
             if (isAuthenticated) {
-                Axios.post(`${backendUrl}/api/cart/add_to_cart`, {
+                Axios.post(`${backendUrl}/api/cart/add`, {
                     user_id: user?.sub,
-                    product_id: JSON.parse(productId),
+                    product_id: productId,
                     quantity: cartDict[productId]
-                })
+                }, { withCredentials: true })
                 .then((res) => {
                     console.log(res);
                 })

@@ -29,7 +29,7 @@ export function Cart() {
             return;
         }
 
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/cart/cart?user=${user?.sub}`)
+        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/cart?user=${user?.sub}`,{ withCredentials: true })
         .then((res) => {
             console.log(res);
             if (res.data.length === 0) {
@@ -91,7 +91,7 @@ export function Cart() {
         }
 
         // get products from backend
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/products-by-id?ids=`+ids)
+        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/by-id?ids=`+ids)
         .then((res) => {
             console.log(res);
             setCart(res.data);
@@ -101,6 +101,7 @@ export function Cart() {
         });
     }
 
+    // handles removing product from cart
     const removeFromCart = (event: any) => {
         // remove product from localStorage
         const cartDict = JSON.parse(localStorage.getItem("cart") || "{}");
@@ -109,10 +110,11 @@ export function Cart() {
 
         // update cart state with removed item
         localStorage.setItem("cart", JSON.stringify(cartDict));
-        const newCart = cart.filter((product: Product) => { return product.id !== parseInt(event.target.dataset.id) });
+        const newCart = cart.filter((product: Product) => { return product.id !== event.target.dataset.id });
         setCart(newCart);
     };
 
+    // handles changing quantity of product in cart
     const quantityChanger = (event: any) => {
         event.preventDefault();
         // get product id and amount from event
@@ -123,7 +125,7 @@ export function Cart() {
         let cartDictCopy = JSON.parse(localStorage.getItem("cart") || "{}");
 
         // check if amount goes above available stock
-        const product: Product = cart.filter((product: Product) => {return product.id === parseInt(productId)})[0];
+        const product: Product = cart.filter((product: Product) => {return product.id === productId})[0];
         if (amount > product.inventory) {
             return
         }
@@ -136,6 +138,17 @@ export function Cart() {
 
         // update cart state
         setCartDict(cartDictCopy);
+    };
+
+    const checkout = () => {
+        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/checkout`, {}, 
+        { withCredentials: true })
+        .then((res) => {
+            window.location.href = res.data;
+        })
+        .catch((err) => {
+            console.log(err);
+        });
     };
 
     return (
@@ -154,7 +167,7 @@ export function Cart() {
                 </div>
             ))}
             {(isAuthenticated) ? (
-                <button>Checkout</button>
+                <button onClick={checkout}>Checkout</button>
             ) : (
                 <p>Please log in to checkout</p>
             )}

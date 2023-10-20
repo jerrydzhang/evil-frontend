@@ -23,7 +23,7 @@ export function EditSingleProduct() {
 
     React.useEffect(() => {
         // get product from backend
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/products/${id}`)
+        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/${id}`)
         .then((res) => {
             console.log(res);
             setProduct(res.data);
@@ -54,7 +54,7 @@ export function EditSingleProduct() {
     };
 
     const saveProduct = () => {
-        Axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/product/update_product/${id}`, 
+        Axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/product/update/${id}`, 
         product, 
         { withCredentials: true })
         .then((res) => {
@@ -66,7 +66,7 @@ export function EditSingleProduct() {
     };
     
     const deleteProduct = () => {
-        Axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/product/delete_product/${id}`, 
+        Axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/product/delete/${id}`, 
         { withCredentials: true })
         .then((res) => {
             console.log(res);

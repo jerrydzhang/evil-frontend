@@ -13,6 +13,7 @@ export interface Product {
     price: number;
     inventory: number;
     last_updated: string;
+    pictures: string[];
 }
 
 export interface Catagory {
@@ -26,4 +27,3 @@ export interface CartItem {
     product_id: number;
     quantity: number;
 }
-

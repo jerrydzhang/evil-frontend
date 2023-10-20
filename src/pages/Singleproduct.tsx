@@ -9,7 +9,7 @@ export function SingleProduct() {
 
     React.useEffect(() => {
         // get product from backend
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/products/${id}`)
+        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/${id}`)
         .then((res) => {
             console.log(res);
             setProduct(res.data);
