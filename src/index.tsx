@@ -20,7 +20,7 @@ root.render(
         domain={domain}
         clientId={clientId}
         authorizationParams={{
-          redirect_uri: "http://localhost:3000/authenticate",
+          redirect_uri: "http://localhost:3000/",
           audience: "http://localhost:8080/",
         }}
         useRefreshTokens

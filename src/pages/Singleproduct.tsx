@@ -27,7 +27,7 @@ export function SingleProduct() {
                 <div>
                     <h1>{product.name}</h1>
                     <h2>{product.price}</h2>
-                    <p>{product.catagory}</p>
+                    <p>{product.category}</p>
                     <p>{product.description}</p>
                 </div>
             )}

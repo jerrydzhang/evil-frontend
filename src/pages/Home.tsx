@@ -18,6 +18,9 @@ export function Home() {
     const getToken = () => {
         getAccessTokenSilently().then((accessToken) => {
             console.log(accessToken);
+        })
+        .catch((err) => {
+            console.log(err);
         });
     }
 

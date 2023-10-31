@@ -19,18 +19,21 @@ export function Authenticate() {
         }
 
         getAccessTokenSilently().then((accessToken) => {
+            console.log(accessToken);
             Axios.post(`${backendUrl}/api/user/login`, {
                 id: user!.sub,
                 email: user!.email,
-            },
-            { headers: { Authorization: `Bearer ${accessToken}` }, withCredentials: true })
+            },{ 
+                headers: { Authorization: `Bearer ${accessToken}` },
+                withCredentials: true 
+            })
             .then((res) => {
                 console.log(res);
                 navigate("/", { replace: true });
             })
             .catch((err) => {
                 console.log(err);
-                logout({ logoutParams: { returnTo: "/" } });
+                logout({ logoutParams: { returnTo: "http://localhost:3000/" } });
             });
         });
 

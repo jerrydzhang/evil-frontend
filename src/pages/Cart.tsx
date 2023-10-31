@@ -4,7 +4,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { CartItem, Product } from "../common/types";
 
 export function Cart() {
-    const {user, isAuthenticated, isLoading, getAccessTokenSilently} = useAuth0();
+    const {user, isAuthenticated, isLoading} = useAuth0();
     const [cart, setCart] = React.useState([]);
     const [cartDict, setCartDict] = React.useState(JSON.parse(localStorage.getItem("cart") || "{}"));
 
@@ -141,7 +141,7 @@ export function Cart() {
     };
 
     const checkout = () => {
-        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/checkout`, {}, 
+        Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/checkout/`, {}, 
         { withCredentials: true })
         .then((res) => {
             window.location.href = res.data;
@@ -156,9 +156,10 @@ export function Cart() {
             <h1>Cart</h1>
             {cart.map((product: Product) => (
                 <div key={product.id}>
-                    <h3>{product.name}</h3>
+                    <a href={`/products/${product.id}`}>{product.name}</a>
+                    <img className="h-12 w-12" src={product.images[0]} />
                     <p>{(product.price*JSON.parse(localStorage.getItem("cart") || "{}")[product.id]).toFixed(2)}</p>
-                    <p>{JSON.parse(localStorage.getItem("cart") || "{}")[product.id]}</p>
+                    <p>{JSON.parse(localStorage.getItem("cart") || "{}")[product.id]}/{product.inventory}</p>
                     <form>
                         <input type="number" defaultValue={JSON.parse(localStorage.getItem("cart") || "{}")[product.id]} />
                         <button data-id={product.id} onClick={quantityChanger}>Change Quantity</button>

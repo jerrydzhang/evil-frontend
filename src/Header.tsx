@@ -13,7 +13,7 @@ export function Header() {
             <a href="/">PLACEHOLDER</a>
         </div>
         <div>
-            <a href="/products">Shop</a>
+            <a href="/product">Shop</a>
             <a href="/about">About</a>
             <a href="/cart">Cart</a>
             <input type="text" placeholder="Search"></input>

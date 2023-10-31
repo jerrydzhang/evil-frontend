@@ -5,20 +5,39 @@ export interface User {
 }
 
 export interface Product {
-    id: number;
+    id: string;
     name: string;
     description: string;
-    catagory_id: number;
-    catagory: string;
+    category: string;
     price: number;
     inventory: number;
     last_updated: string;
-    pictures: string[];
+    created_at: string;
+    images: string[];
+    active: boolean;
 }
 
-export interface Catagory {
+export interface Order {
     id: number;
-    name: string;
+    user_id: string;
+    products: JSON;
+    status: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ExpandedOrder {
+    id: number;
+    user_id: string;
+    products: OrderItem[];
+    status: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface OrderItem {
+    product: Product;
+    quantity: number;
 }
 
 export interface CartItem {

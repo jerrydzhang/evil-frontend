@@ -12,13 +12,6 @@ const LogoutButton = () => {
     // 2. Send a request to auth0 to logout
     // 3. Clear the cart
     const logoutHandler = async () => {
-        await Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/user/logout`, {}, { withCredentials: true })
-        .then((res) => {
-            console.log(res);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
         logout({ logoutParams: { returnTo: window.location.origin } })
         localStorage.setItem("cart", JSON.stringify({}));
     }

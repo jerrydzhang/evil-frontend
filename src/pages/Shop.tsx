@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import Axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
+import { Product } from "../common/types";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export function Shop() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL!;
     const { user, isAuthenticated } = useAuth0();
-    const [products, setProducts] = useState([]);
-    const [isEditing, setIsEditing] = useState(false);
+    const navigate = useNavigate();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [searchParams, setSearchParams] = useSearchParams();
 
     React.useEffect(() => {
-        Axios.get(`${backendUrl}/api/product`)
+        if (searchParams.get("category")) {
+            Axios.get(`${backendUrl}/api/product/category/${searchParams.get("category")}`)
             .then((res) => {
                 console.log(res);
                 setProducts(res.data);
@@ -17,13 +21,31 @@ export function Shop() {
             .catch((err) => {
                 console.log(err);
             });
+            return;
+        } else {
+            Axios.get(`${backendUrl}/api/product`)
+            .then((res) => {
+                console.log(res);
+                setProducts(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+        }
     }, []);
 
     const addToCart = (event: any) => {
         const productId = event.target.dataset.id;
         const cartDict = JSON.parse(localStorage.getItem("cart") || "{}");
+        const product = products.find((product) => product.id === productId);
+        if (!product) {
+          return;
+        }
         // if cart exists, add to it
         if (cartDict[productId]) {
+            if (cartDict[productId] >= product.inventory) {
+                return;
+            }
             cartDict[productId] = cartDict[productId] + 1 || 1;
             localStorage.setItem("cart", JSON.stringify(cartDict));
             if (isAuthenticated) {
@@ -41,6 +63,9 @@ export function Shop() {
             }
         // if cart doesn't exist, create it
         } else {
+            if (1 >= product.inventory) {
+                return;
+            }
             cartDict[productId] = 1;
             localStorage.setItem("cart", JSON.stringify(cartDict));
             if (isAuthenticated) {
@@ -59,23 +84,37 @@ export function Shop() {
         }
     }
 
+    const getCategory = (event: any) => {
+        const category = event.target.value;
+        if (category === "all") {
+            setSearchParams({});
+            navigate("/product");
+        } else {
+            setSearchParams({ category: category });
+            navigate(`/product?category=${category}`);
+        }
+        window.location.reload();
+    }
+
     return (
         <div>
             <h1>Shop</h1>
-            <input type="checkbox" checked={isEditing} onChange={() => setIsEditing(!isEditing)} />
-            {isEditing && (
-                <a href="/products/create">Create Product</a>
-            )}
-            {products.map((product: any) => (
+            <select id="category" value={searchParams.get("category")||"all"} onChange={getCategory}>
+                <option value="all">All</option>
+                <option value="t-shirt">T-Shirts</option>
+                <option value="pants">Pants</option>
+            </select>
+            {products.sort((a, b) => a.created_at < b.created_at ? 1 : -1)
+            .filter((product) => product.inventory > 0)
+            .map((product: Product) => (
                 <div key={product.id}>
-                    {isEditing ? (
-                    <a href={`/products/${product.id}/edit`}>{product.name}</a>
-                    ):(
-                    <a href={`/products/${product.id}`}>{product.name}</a>
-                    )}
-                    <p>{product.catagory}</p>
-                    <p>{product.price}</p>
+                    <a href={`/product/${product.id}`}>{product.name}</a>
+                    <img className="h-12 w-12" src={product.images[0]} />
+                    <p>{product.inventory}</p>
+                    <p>{product.category}</p>
+                    <p>${product.price}</p>
                     <p>{product.description}</p>
+                    <p>{product.created_at}</p>
                     <button data-id={product.id} onClick={addToCart}>Add To Cart</button>
                 </div>
             ))}

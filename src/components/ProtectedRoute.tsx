@@ -31,6 +31,9 @@ const ProtectedRoute = (props: any) => {
             console.log(res);
             setRoles(res.data.roles);
         })
+        .catch((err) => {
+            console.log(err);
+        });
 
     }, [isLoading]);
 
