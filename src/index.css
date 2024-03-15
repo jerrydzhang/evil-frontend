@@ -3,29 +3,38 @@
 @tailwind utilities;
 
 :root{
-    --text-color: #1E1E24;
-    --primary-color: #f9f9ff;
-    --secondary-color: #b3c2ff;
-    --tertiary-color: #d5acff;
-    --accent-color: #6b00b3;
-    --boarder-color: #d0d7de;
+    --white: hsla(0, 0%, 100%, 1);
+    --powder-blue: hsla(202, 46%, 72%, 1);
+    --slate-blue: #6a6ab4;
+    --tekhelet: #523979;
+    --violet-jtc: #4c244a;
+    --licorice: hsla(347, 23%, 12%, 1);
+    --eerie-black: #1D2226;
+    --eerie-accent: #242a2e;
+    --black: hsla(0, 0%, 0%, 1);
 }
-
-/* @media (prefers-color-scheme: dark) {
-    :root {
-        --text-color: #f9f9ff;
-        --primary-color: #1E1E24;
-        --secondary-color: #b3c2ff;
-        --tertiary-color: #d5acff;
-        --accent-color: #6b00b3;
-        --boarder-color: #30363d;
-    }
-} */
 
 a {
     text-decoration: underline;
+    pointer-events: auto;
+}
+
+img,
+input,
+button,
+label,
+select,
+h1,
+h2,
+p {
+    pointer-events: auto;
+}
+
+body {
+    pointer-events: none;
 }
 
 * {
-    background-color: var(--primary-color);
+    font-family: 'Poppins', sans-serif;
+    color: var(--white);
 }

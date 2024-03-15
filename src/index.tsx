@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
@@ -20,7 +20,7 @@ root.render(
         domain={domain}
         clientId={clientId}
         authorizationParams={{
-          redirect_uri: "http://localhost:3000/",
+          redirect_uri: "http://localhost/",
           audience: "http://localhost:8080/",
         }}
         useRefreshTokens

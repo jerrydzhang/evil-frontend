@@ -15,22 +15,27 @@ export interface Product {
     created_at: string;
     images: string[];
     active: boolean;
+    variant_id: number;
 }
 
 export interface Order {
-    id: number;
+    id: string;
     user_id: string;
     products: JSON;
     status: string;
+    name: string;
+    address: string;
     created_at: string;
     updated_at: string;
 }
 
 export interface ExpandedOrder {
-    id: number;
+    id: string;
     user_id: string;
     products: OrderItem[];
     status: string;
+    name: string;
+    address: string;
     created_at: string;
     updated_at: string;
 }
@@ -45,4 +50,11 @@ export interface CartItem {
     user_id: string;
     product_id: number;
     quantity: number;
+}
+
+export enum Size {
+    S = 0,
+    M = 1,
+    L = 2,
+    XL = 3
 }

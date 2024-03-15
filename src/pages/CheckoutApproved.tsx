@@ -1,11 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-export function CheckoutApproved() {
+type CheckoutApprovedProps = {
+    setCart: React.Dispatch<React.SetStateAction<{[key: string]: number}>>;
+}
+
+export function CheckoutApproved({setCart}: CheckoutApprovedProps) {
     const navigate = useNavigate();
     
     React.useEffect(() => {
-        localStorage.removeItem("cart");
+        setCart({});
         navigate("/", { replace: true });
     }, []);  
 

@@ -1,117 +1,46 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import { CartItem, Product } from "../common/types";
+import { PrivacyScreen } from "../components/PrivacyScreen";
+import { CartItemPanel } from "../components/CartItem";
+import "./Cart.css";
+import { useNavigate } from "react-router-dom";
 
-export function Cart() {
+type CartProps = {
+    cart: {[key: string]: number};
+    setCart: React.Dispatch<React.SetStateAction<{[key: string]: number}>>;
+}
+
+export function Cart({ cart, setCart }: CartProps) {
     const {user, isAuthenticated, isLoading} = useAuth0();
-    const [cart, setCart] = React.useState([]);
-    const [cartDict, setCartDict] = React.useState(JSON.parse(localStorage.getItem("cart") || "{}"));
+    const [cartProducts, setCartProducts] = useState<Product[]>([]);
+    const [init, setInit] = useState(false);
+    const navigate = useNavigate();
 
-    // on first render, get products from backend
-    React.useEffect(() => {
-        // get ids from localStorage
-        const ids = Object.keys(cartDict);
+    const ids = useMemo(() => {
+        return Object.keys(cart);
+    }, [cart]);
 
-        // if no ids, return
-        if (ids.length === 0) { 
-            return;
-        }
-
-        // get products from backend
-        rerenderCart();
-    }, []);
-
-    // on first render, if authenticated, get cart from user
-    React.useEffect(() => {
-        // if not authenticated, return
-        if(!isAuthenticated) {
-            return;
-        }
-
-        Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/cart?user=${user?.sub}`,{ withCredentials: true })
-        .then((res) => {
-            console.log(res);
-            if (res.data.length === 0) {
-                // if their cart is empty, update it with localStorage
-                Axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
-                    user_id: user?.sub,
-                    cart: JSON.parse(localStorage.getItem("cart") || "{}")
-                },
-                { withCredentials: true })
-                .then((res) => {
-                    console.log(res);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-            } else {
-                // if their cart is not empty, update localStorage with backend
-                let cartDict = Object.fromEntries(res.data.map((cartItem: CartItem) => [cartItem.product_id, cartItem.quantity]))   
-                localStorage.setItem("cart", JSON.stringify(cartDict));
-                setCartDict(cartDict);
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    }, [isLoading])
-
-    // whenever cartDict changes, update backend
-    React.useEffect(() => {
-        // dont run if not authenticated
-        if (!isAuthenticated) {
-            return;
-        }
-
-        Axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
-            user_id: user?.sub,
-            cart: JSON.parse(localStorage.getItem("cart") || "{}")
-        },
-        { withCredentials: true })
-        .then((res) => {
-            console.log(res);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-        
-        // rerender cart with new cartDict
-        rerenderCart();
-    }, [cartDict]);
-
-    // rerender cart by using ids from localStorage to get products from backend
-    const rerenderCart = () => {
-        // get ids from localStorage
-        const ids = Object.keys(cartDict);
-
-        // if no ids, return
-        if (ids.length === 0) { 
-            return;
-        }
-
+    useEffect(() => {
         // get products from backend
         Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/by-id?ids=`+ids)
         .then((res) => {
             console.log(res);
-            setCart(res.data);
+            setCartProducts(res.data);
         })
         .catch((err) => {
             console.log(err);
         });
-    }
+    }, [ids]);
 
     // handles removing product from cart
     const removeFromCart = (event: any) => {
-        // remove product from localStorage
-        const cartDict = JSON.parse(localStorage.getItem("cart") || "{}");
-        delete cartDict[event.target.dataset.id];
-        setCartDict(cartDict);
-
-        // update cart state with removed item
-        localStorage.setItem("cart", JSON.stringify(cartDict));
-        const newCart = cart.filter((product: Product) => { return product.id !== event.target.dataset.id });
-        setCart(newCart);
+        setCart(() => {
+            const newCart = {...cart};
+            delete newCart[event.target.parentElement.dataset.id];
+            return newCart;
+        });
     };
 
     // handles changing quantity of product in cart
@@ -120,24 +49,20 @@ export function Cart() {
         // get product id and amount from event
         const productId = event.target.dataset.id;
         // get amount by going through parent element
-        const amount = parseInt(event.target.parentElement.children[0].valueAsNumber);
-
-        let cartDictCopy = JSON.parse(localStorage.getItem("cart") || "{}");
+        let amount = parseInt(event.target.parentElement.children[1].valueAsNumber);
 
         // check if amount goes above available stock
-        const product: Product = cart.filter((product: Product) => {return product.id === productId})[0];
+        const product: Product = cartProducts.filter((product: Product) => {return product.id === productId})[0];
         if (amount > product.inventory) {
-            return
+            amount = product.inventory;
         }
 
         // change cartDict
-        cartDictCopy[productId] = amount;
-
-        // update localStorage
-        localStorage.setItem("cart", JSON.stringify(cartDictCopy));
+        let cartCopy = {...cart};
+        cartCopy[productId] = amount;
 
         // update cart state
-        setCartDict(cartDictCopy);
+        setCart(cartCopy);
     };
 
     const checkout = () => {
@@ -152,26 +77,47 @@ export function Cart() {
     };
 
     return (
-        <div>
+        <div className="flex flex-col">
             <h1>Cart</h1>
-            {cart.map((product: Product) => (
-                <div key={product.id}>
-                    <a href={`/products/${product.id}`}>{product.name}</a>
-                    <img className="h-12 w-12" src={product.images[0]} />
-                    <p>{(product.price*JSON.parse(localStorage.getItem("cart") || "{}")[product.id]).toFixed(2)}</p>
-                    <p>{JSON.parse(localStorage.getItem("cart") || "{}")[product.id]}/{product.inventory}</p>
-                    <form>
-                        <input type="number" defaultValue={JSON.parse(localStorage.getItem("cart") || "{}")[product.id]} />
-                        <button data-id={product.id} onClick={quantityChanger}>Change Quantity</button>
-                    </form>
-                    <button data-id={product.id} onClick={removeFromCart}>Remove From Cart</button>
-                </div>
-            ))}
-            {(isAuthenticated) ? (
-                <button onClick={checkout}>Checkout</button>
-            ) : (
-                <p>Please log in to checkout</p>
+            <div className="cart-container">
+            <div className="flex flex-col">
+            {(cartProducts.length === 0) && (
+                <div className="cart-item-container m-2 p-4"></div>
             )}
+            {cartProducts.map((product: Product) => (
+                <CartItemPanel
+                    key={product.id}
+                    product={product}
+                    quantity={cart[product.id]}
+                    quantityChanger={quantityChanger}
+                    removeFromCart={removeFromCart}
+                />
+            ))}
+            </div>
+            <div className="">
+                <div className="summary-container m-2 p-8 bg-[--eerie-accent] rounded-lg flex flex-col gap-1">
+                    <h1 className="text-2xl">Summary</h1>
+                    <hr className="mb-2"/>
+                    <div className="flex"><h2>SubTotal: </h2><h2 className="ml-auto">${cartProducts.reduce((acc: number, product: Product) => {
+                        return acc + product.price * cart[product.id];
+                    }, 0).toFixed(2)}</h2></div>
+                    <div className="flex"><p>Shipping: </p><p className="ml-auto">Free</p></div>
+                    <div className="flex"><h2>Total: </h2><h2 className="ml-auto">${(cartProducts.reduce((acc: number, product: Product) => {
+                        return acc + product.price * cart[product.id];
+                    }, 0)).toFixed(2)}</h2></div>
+                </div>
+            {(isAuthenticated) ? (
+                (Object.keys(cart).length >= 1 ? 
+                <button className="btn w-fit" onClick={checkout}>Checkout</button>
+                : 
+                <button className="btn w-fit" onClick={()=>navigate("/product")}>Buy Stuff</button>
+                )
+            ) : (
+                <p className="btn w-fit">Please log in to checkout</p>
+            )}
+            </div>
+            </div>
+            <PrivacyScreen />
         </div>
     );
 }

@@ -2,9 +2,7 @@ import React from "react";
 import Axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 
-
-
-const LogoutButton = () => {
+const LogoutButton = (props: any) => {
     const { logout } = useAuth0();
 
     // On logout
@@ -17,7 +15,7 @@ const LogoutButton = () => {
     }
 
     return (
-        <button onClick={logoutHandler}>
+        <button className={props.className} onClick={logoutHandler}>
         Log Out
         </button>
     );
