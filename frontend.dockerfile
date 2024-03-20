@@ -46,8 +46,8 @@ FROM nginx:alpine
 # Copy config nginx
 COPY --from=build /app/.nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-RUN apt-get update && \
-    apt-get install -y openssl && \
+RUN apk update && \
+    apk install openssl && \
     openssl genrsa -des3 -passout pass:x -out server.pass.key 2048 && \
     openssl rsa -passin pass:x -in server.pass.key -out server.key && \
     rm server.pass.key && \
