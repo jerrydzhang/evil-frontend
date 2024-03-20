@@ -25,7 +25,7 @@ type BigGuyProps = JSX.IntrinsicElements['group'] & {
   };
 
 export function BigGuyModel({ raysref, ...props }: BigGuyProps) {
-  const { nodes, materials } = useGLTF("/models/bigGuy.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF("bigGuy.glb") as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <mesh
