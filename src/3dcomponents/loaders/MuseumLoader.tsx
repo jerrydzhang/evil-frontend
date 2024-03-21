@@ -107,7 +107,7 @@ type GLTFResult = GLTF & {
 };
 
 export function MuseumScene({products, moveCamera, handleMouseMove, ...props }: MuseumLoaderProps) {
-  const { nodes, materials } = useGLTF("museum.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "museum.glb") as GLTFResult;
 
   return (
     <group {...props} dispose={null}>

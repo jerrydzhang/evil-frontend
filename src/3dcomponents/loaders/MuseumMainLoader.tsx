@@ -17,7 +17,7 @@ type GLTFResult = GLTF & {
 };
 
 export function MuseumMainModel(props: JSX.IntrinsicElements["group"]) {
-  const { nodes, materials } = useGLTF("museum-main.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "museum-main.glb") as GLTFResult;
   return (
     <group {...props} dispose={null}>
       <mesh
