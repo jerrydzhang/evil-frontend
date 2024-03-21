@@ -8,7 +8,7 @@ WORKDIR /app
 
 # 
 COPY package.json /app/package.json
-COPY package-lock.json /app/package-lock.json
+COPY yarn.lock /app/yarn.lock
 
 # Same as npm install
 RUN rm -rf node_modules && yarn install --frozen-lockfile
@@ -18,7 +18,7 @@ COPY . /app
 ENV CI=false
 ENV PORT=3000
 
-CMD [ "npm", "start" ]
+CMD [ "yarn", "start" ]
 
 FROM development AS build
 
@@ -46,8 +46,10 @@ FROM nginx:alpine
 # Copy config nginx
 COPY --from=build /app/.nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
+WORKDIR /etc/nginx
+
 RUN apk update && \
-    apk install openssl && \
+    apk add openssl && \
     openssl genrsa -des3 -passout pass:x -out server.pass.key 2048 && \
     openssl rsa -passin pass:x -in server.pass.key -out server.key && \
     rm server.pass.key && \
