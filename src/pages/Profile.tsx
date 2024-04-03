@@ -33,9 +33,9 @@ export function Profile() {
     }
 
     return (
-        <div>
+        <div className="m-2">
             <div>
-                <h1>Hello {user!.name}</h1>
+                <h1>Hello {user!.name}!</h1>
                 <p>Email: {user!.email}</p>
                 <p>User ID: {user!.sub!.split("|").pop()!.trim()}</p>
         </div>

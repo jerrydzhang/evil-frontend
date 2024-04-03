@@ -14,7 +14,7 @@ export function pageTransition(
   home?: boolean, 
   setHome?: Dispatch<SetStateAction<boolean>>) 
 {
-  const transitionLocations = ["/", "/contact"];
+  const transitionLocations = ["/", "/about"];
   if(!transitionLocations.includes(path)) {
     setFocused(true);
     setFocus(focus);

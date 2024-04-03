@@ -2,6 +2,7 @@ import Axios from "axios";
 import React, { useMemo, useState } from "react";
 import { ExpandedOrder, OrderItem, Product } from "../common/types";
 import AdminOrder from "../components/AdminOrder";
+import { DashboardGroupProduct } from "../components/DashboardGroupProduct";
 import DashboardProduct from "../components/DashboardProduct";
 
 export function Dashboard() {
@@ -19,11 +20,12 @@ export function Dashboard() {
     const [newProductCategory, setNewProductCategroy] = useState<string>();
     const [newProductImage, setNewProductImage] = useState<string>();
 
+	const [loading, setLoading] = useState(false);
+
 
     React.useEffect(() => {
         Axios.get(`${backendUrl}/api/product`)
             .then((res) => {
-                console.log(res);
                 const dict = res.data.reduce(function(map: any, product: Product) {
                     if (map[product.name]) {
                         map[product.name][product.variant_id] = product;
@@ -43,7 +45,6 @@ export function Dashboard() {
 
         Axios.get(`${backendUrl}/api/order/expand`)
             .then((res) => {
-                console.log(res);
                 setOrders(res.data);
                 setFilteredOrders(res.data);
             })
@@ -52,7 +53,8 @@ export function Dashboard() {
             });
     }, []);
 
-    const addProduct = (event: any) => {
+    const addProduct = () => {
+		setLoading(true);
         for (let i = 0; i < newProductVariants!; i++) {
             Axios.post(`${backendUrl}/api/product/create`, {
                 name: newProuctTitle,
@@ -64,22 +66,16 @@ export function Dashboard() {
                 image: newProductImage
             },
             { withCredentials: true })
-            .then((res) => {
-                console.log(res);
-                // setProductsDict({...productsDict, [newProuctTitle!]: {...productsDict[newProuctTitle!], [i]: {
-                //     name: newProuctTitle,
-                //     description: newProductDescription,
-                //     inventory: newProductInventory,
-                //     price: newProductPrice,
-                //     variant_id: i,
-                //     category: newProductCategory,
-                //     images: [newProductImage]
-                // }}})
+            .then(() => {
+				window.location.reload();
             })
             .catch
             ((err) => {
                 console.log(err);
-            });
+            })
+			.finally(() => {
+				setLoading(false);
+			});
         }
     }
 
@@ -142,21 +138,25 @@ export function Dashboard() {
         <div>
             <h1>Dashboard</h1>
             <div className="flex gap-5">
-                <div className="flex-1">
+                <div className="flex flex-col">
                     <h1>Add Product</h1>
-                    <form>
+                    <form className="flex flex-col">
                         <input className="bg-[--eerie-black] border-2 border-white" type="text" placeholder="Title" onChange={(e) => setNewProductTitle(e.target.value)}/>
-                        <input className="bg-[--eerie-black] border-2 border-white" type="text" placeholder="Description" onChange={(e) => setNewProductDescription(e.target.value)}/>
+                        <textarea className="bg-[--eerie-black] border-2 border-white" placeholder="Description" onChange={(e) => setNewProductDescription(e.target.value)}/>
                         <input className="bg-[--eerie-black] border-2 border-white" type="number" placeholder="Inventory" onChange={(e) => setNewProductInventory(parseInt(e.target.value))}/>
                         <input className="bg-[--eerie-black] border-2 border-white" type="number" placeholder="Price" onChange={(e) => setNewProductPrice(parseFloat(e.target.value))}/>
-                        <input className="bg-[--eerie-black] border-2 border-white" type="number" placeholder="Variant" onChange={(e) => setNewProductVariants(parseInt(e.target.value))}/>
+                        <input className="bg-[--eerie-black] border-2 border-white" type="number" placeholder="Variants" onChange={(e) => setNewProductVariants(parseInt(e.target.value))}/>
                         <input className="bg-[--eerie-black] border-2 border-white" type="text" placeholder="Category" onChange={(e) => setNewProductCategroy(e.target.value)}/>
                         <img className="bg-[--eerie-black]" src={newProductImage} alt="No Image"/>
                         <input className="bg-[--eerie-black] border-2 border-white" type="text" placeholder="Image" onChange={(e) => setNewProductImage(e.target.value)}/>
-                        <button onClick={(e) => {
+						{!loading ?
+                        <button className="btn" onClick={(e) => {
                             e.preventDefault();
-                            addProduct(e);
+                            addProduct();
                         }}>Add Product</button>
+						:
+						<button className="btn w-[92px] h-[42px] bg-[--slate-blue]"><div className="lds-ring"><div></div><div></div><div></div><div></div></div></button>
+						}	
                     </form>
                 </div>
                 <div className="flex-1">
@@ -165,12 +165,7 @@ export function Dashboard() {
                     <button onClick={searchProducts}>Search</button>
                 </form>
                 {Object.keys(filteredProducts).map((name: string) => (
-                    <div key={name} className="bg-[--eerie-accent] my-4">
-                        <h1 className="text-2xl">{name}</h1>
-                        {Object.keys(filteredProducts[name]).map((variant_id: string) => (
-                            <DashboardProduct product={filteredProducts[name][parseInt(variant_id)]} productsDict={productsDict} setProductsDict={setProductsDict} key={variant_id}/>
-                        ))}
-                    </div>
+					<DashboardGroupProduct name={name} products={filteredProducts[name]} productsDict={productsDict} setProductsDict={setProductsDict} key={name}/>
                 ))}
                 </div>
                 <div className="flex-1">
@@ -182,19 +177,21 @@ export function Dashboard() {
                     </select>
                     <button onClick={searchOrders}>Search</button>
                 </form>
-                <h1>Processing Orders</h1>
+                <h1 className="text-xl">Processing Orders</h1>
                 {filteredOrders.sort((a, b) => a.created_at > b.created_at ? 1 : -1)
                 .filter((order: ExpandedOrder) => order.status !== "delievered" && order.status !== "returned")
                 .map((order: ExpandedOrder) => (
                 <AdminOrder order={order} updateOrderStatus={updateOrderStatus} key={order.id}/>
                 ))}
-                <h1>Delievered Orders</h1>
+				<hr/>
+                <h1 className="text-xl">Delievered Orders</h1>
                 {filteredOrders.sort((a, b) => a.created_at > b.created_at ? 1 : -1)
                 .filter((order: ExpandedOrder) => order.status == "delievered")
                 .map((order: ExpandedOrder) => (
                     <AdminOrder order={order} updateOrderStatus={updateOrderStatus} key={order.id}/>
                 ))}
-                <h1>Returned Orders</h1>
+				<hr/>
+                <h1 className="text-xl">Returned Orders</h1>
                 {filteredOrders.sort((a, b) => a.created_at > b.created_at ? 1 : -1)
                 .filter((order: ExpandedOrder) => order.status == "returned")
                 .map((order: ExpandedOrder) => (

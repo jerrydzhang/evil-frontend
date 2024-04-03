@@ -19,7 +19,7 @@ const Order = ({ order }: OrderProps) => {
 
     return (
         <div className="flex flex-col w-fit p-5 rounded-sm bg-[var(--eerie-accent)] transition-all">
-            <NavLink className="text-lg" to={`/dashboard/${order.id}`}>Order ID: {order.id.substring(6)}</NavLink>
+            <NavLink className="text-lg" to={`/order/${order.id}`}>Order ID: {order.id.substring(6)}</NavLink>
             <div className="flex flex-row items-center">
             <div className="size-8">
             <input type="checkbox" id={order.id} className="hidden" onChange={() => setExpanded(expanded => !expanded)}/>

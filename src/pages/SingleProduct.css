@@ -122,9 +122,10 @@
     padding: 1rem 2rem;
     width: 100%;
     min-height: calc(100vh - 56px);
-    background-image: 
-        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-        url("/public/evil\ backyard.png");
+    /* background-image:  */
+    /*     linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), */
+    /*     url("/public/evil\ backyard.png"); */
+	pointer-events: auto;
     background-size: 400px;
     background-repeat: repeat;
 }

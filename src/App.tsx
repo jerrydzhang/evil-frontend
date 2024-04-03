@@ -12,7 +12,7 @@ import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Header } from './Header';
 import { Home } from './pages/Home';
-import { Contact } from './pages/Contact';
+import { About } from './pages/About';
 import { Shop } from './pages/Shop';
 import { Cart } from './pages/Cart';
 import { Profile } from './pages/Profile';
@@ -31,6 +31,7 @@ import { Vector3 } from 'three';
 import { ThreeDLoading } from './3dcomponents/3dLoadingScreen';
 import { CartItem, Product } from './common/types';
 import React from 'react';
+import { SingleOrder } from './pages/SingleOrder';
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
   const [cart, setCart] = useState<{[key: string]: number}>({}); // [id, quantity]
   const [products, setProducts] = useState<{[key: string]: Product[]}>({});
   const [page, setPage] = useState(1);
+  const [currentCategory, setCurrentCategory] = useState<string | null>(null);
 
   // auth0 stuff
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -80,7 +82,6 @@ function App() {
 
     Axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/cart?user=${user?.sub}`,{ withCredentials: true })
     .then((res) => {
-        console.log(res);
         if (res.data.length === 0) {
             // if their cart is empty, update it with localStorage
             Axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/cart/update_cart`, {
@@ -89,7 +90,6 @@ function App() {
             },
             { withCredentials: true })
             .then((res) => {
-                console.log(res);
             })
             .catch((err) => {
                 console.log(err);
@@ -118,7 +118,6 @@ React.useEffect(() => {
     },
     { withCredentials: true })
     .then((res) => {
-        console.log(res);
     })
     .catch((err) => {
         console.log(err);
@@ -142,8 +141,8 @@ React.useEffect(() => {
       />}
       <AnimatePresence mode="wait" initial={false}>
         <div key={location.key} className="flex flex-col min-h-[calc(100vh-56px)]">
-        <Routes location={location} key={location.key}>
-          <Route path="/contact" element={<Contact
+        <Routes location={location}>
+          <Route path="/about" element={<About
             home={home}
             setHome={setHome}
             focused={focused}
@@ -156,6 +155,8 @@ React.useEffect(() => {
             setProducts={setProducts}
             page={page}
             setPage={setPage}
+			currentCategory={currentCategory}
+			setCurrentCategory={setCurrentCategory}
           />} />
           <Route path="/product/:name" element={<SingleProduct
             cart={cart}
@@ -171,6 +172,7 @@ React.useEffect(() => {
             setCart={setCart}
           />} />
           <Route path="/profile" element={<Profile/>} />
+		  <Route path="/order/:id" element={<SingleOrder/>} />
           <Route path="/authenticate" element={<Authenticate/>} />
           <Route path="/checkout-approved" element={<CheckoutApproved
             setCart={setCart}

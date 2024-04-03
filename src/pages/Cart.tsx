@@ -16,6 +16,7 @@ export function Cart({ cart, setCart }: CartProps) {
     const {user, isAuthenticated, isLoading} = useAuth0();
     const [cartProducts, setCartProducts] = useState<Product[]>([]);
     const [init, setInit] = useState(false);
+	const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const ids = useMemo(() => {
@@ -66,6 +67,7 @@ export function Cart({ cart, setCart }: CartProps) {
     };
 
     const checkout = () => {
+		setLoading(() => true);
         Axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/checkout/`, {}, 
         { withCredentials: true })
         .then((res) => {
@@ -78,7 +80,6 @@ export function Cart({ cart, setCart }: CartProps) {
 
     return (
         <div className="flex flex-col">
-            <h1>Cart</h1>
             <div className="cart-container">
             <div className="flex flex-col">
             {(cartProducts.length === 0) && (
@@ -108,7 +109,10 @@ export function Cart({ cart, setCart }: CartProps) {
                 </div>
             {(isAuthenticated) ? (
                 (Object.keys(cart).length >= 1 ? 
+				!loading ?
                 <button className="btn w-fit" onClick={checkout}>Checkout</button>
+				:
+				<button className="btn w-[110px] h-[42px] bg-[--slate-blue]"><div className="lds-ring"><div></div><div></div><div></div><div></div></div></button>
                 : 
                 <button className="btn w-fit" onClick={()=>navigate("/product")}>Buy Stuff</button>
                 )

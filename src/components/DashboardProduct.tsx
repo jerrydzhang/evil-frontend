@@ -23,6 +23,8 @@ const DashboardProduct = (
     const [images, setImages] = useState<string[]>(product.images);
     const [draggedImage, setDraggedImage] = useState<string>("");
 
+	const [loading, setLoading] = useState(false);
+
     const dragStart = (event: any) => {
         setDraggedImage(event.target.src);
     }
@@ -38,15 +40,12 @@ const DashboardProduct = (
     }
 
     const updateProduct = (event: any) => {
-        console.log(event);
-        console.log(images);
-
         const productId = event.target.dataset.id;
-        console.log(productId);
 
         if (!product) {
           return;
         }
+		setLoading(true);
 
         Axios.put(`${backendUrl}/api/product/update/${productId}`, {
             name: title,
@@ -56,7 +55,6 @@ const DashboardProduct = (
             is_active: active
         },{ withCredentials: true })
         .then((res) => {
-            console.log(res);
             setProductsDict((productsDict) => {
                 const newProductsDict = {...productsDict};
                 newProductsDict[product.name][product.variant_id].inventory += inventoryChange ? inventoryChange : 0;
@@ -72,7 +70,10 @@ const DashboardProduct = (
         })
         .catch((err) => {
             console.log(err);
-        });
+        })
+		.finally(() => {
+			setLoading(false);
+		});
     };
 
     const addImage = (event: any) => {
@@ -108,7 +109,7 @@ const DashboardProduct = (
             <p>inventory: {product.inventory}</p>
             <p>{product.category}</p>
             <p>${product.price}</p>
-            <input className=" bg-[--eerie-black]" type="text" defaultValue={description} onChange={(e) => setDescription(e.target.value)} />
+            <textarea className=" bg-[--eerie-black]" defaultValue={description} onChange={(e) => setDescription(e.target.value)} />
             <input className="bg-[--eerie-black]" type="number" data-id={product.id} onChange={(e) => setInventoryChange(parseInt(e.target.value))} />
             <input type="checkbox" defaultChecked={product.active} onChange={() => setActive(active => !active)} />
             <button data-id={product.id} onClick={updateProduct}>Update</button>
@@ -117,7 +118,7 @@ const DashboardProduct = (
     }
 
     return (
-        <div key={product.id}>
+        <div className="py-2" key={product.id}>
         <div>
         <a href={`/products/${product.id}`}>{product.name}</a>
         <button onClick={() => setEditing(editing => !editing)}>Edit</button>
@@ -148,7 +149,12 @@ const DashboardProduct = (
         <p>{product.description}</p>
         <input className="bg-[--eerie-black]" type="number" data-id={product.id} onChange={(e) => setInventoryChange(parseInt(e.target.value))} />
         <input type="checkbox" defaultChecked={product.active} onChange={() => setActive(active => !active)} />
-        <button data-id={product.id} onClick={updateProduct}>Update</button>
+		{
+		!loading ?
+        <button className="btn" data-id={product.id} onClick={updateProduct}>Update</button>
+		:
+		<button className="btn w-[92px] h-[42px] bg-[--slate-blue]"><div className="lds-ring"><div></div><div></div><div></div><div></div></div></button>
+		}
         </div>
 );
 }

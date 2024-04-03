@@ -47,6 +47,10 @@ const MovingRig = ({ focused, setFocused, focus, setFocus, radius, setRadius, po
     }, []);
 
     useEffect(() => {
+		if (!cameraControlsRef.current) {
+			return;
+		}
+
         if (focused) {
             cameraControlsRef.current.smoothTime = 0;
         } else {

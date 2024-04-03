@@ -1,4 +1,4 @@
-import { BakeShadows, Box, MeshReflectorMaterial, OrbitControls, OrthographicCamera, Stars, useGLTF, useHelper, Stats, SpotLight, Html, MeshPortalMaterial, Environment, PerformanceMonitor, FirstPersonControls, CameraControls, Lightformer } from "@react-three/drei";
+import { BakeShadows, Box, MeshReflectorMaterial, OrbitControls, OrthographicCamera, Stars, useGLTF, useHelper, Stats, SpotLight, Html, MeshPortalMaterial, Environment, PerformanceMonitor, FirstPersonControls, CameraControls, Lightformer, Loader } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 import { Model, TowerLight } from "./loaders/CityLoader";
@@ -12,12 +12,8 @@ import { lerp } from "three/src/math/MathUtils";
 import MaterialShader from "./shaders/MaterialShader";
 import { MyCustomEffect } from "./shaders/ScreenShader";
 import { Navigate, Route, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
 import { CityScene } from "./CityScene";
-import { Shop } from "../pages/Shop";
-import { Contact } from "../pages/Contact";
 import { BigGuy } from "./BigGuy";
-import { Resizer } from "postprocessing";
 import ShopScene from "./ShopScene";
 import OrbitRig from './rigs/OrbitRig';
 import MovingRig from "./rigs/MovingRig";
@@ -56,13 +52,13 @@ export function ThreeDComponent (props: {
         camera={{ position: new Vector3(EPS,EPS,EPS), aspect: window.innerWidth / window.innerHeight, near: 0.1, far: 1000}}
         dpr={dpr}
       >
-        <Suspense fallback={<ThreeDLoading />}>
+        <Suspense fallback={null}>
         {/* <VisbilityHandler path={path}/> */}
         {/* <fog attach="fog" args={["#707070", 0, 50]} /> */}
         {/* <color attach="background" args={["black"]} /> */}
         <CityScene visible={path === "/"} position={[0,0,0]}/>
-        <ShopScene visible={path === "/product"} position={[0,0,0]} products={props.products} setProducts={props.setProducts} page={props.page} cameraPosition={props.cameraPosition} setCameraPosition={props.setCameraPosition} cameraControlsRef={cameraControlsRef}/>
-        <BigGuy visible={path === "/contact"} position={[0,0,0]} ref={sun}/>
+        <ShopScene visible={path.includes("/product")} position={[0,0,0]} products={props.products} setProducts={props.setProducts} page={props.page} cameraPosition={props.cameraPosition} setCameraPosition={props.setCameraPosition} cameraControlsRef={cameraControlsRef}/>
+        <BigGuy visible={path === "/about"} position={[0,0,0]} ref={sun}/>
         {/* <mesh position={[30,30,-30]} ref={sun}>
           <circleGeometry args={[10]} />
           <meshBasicMaterial
@@ -71,7 +67,7 @@ export function ThreeDComponent (props: {
         </mesh> */}
         {/* <Stars radius={200} speed={0.5} depth={2}/> */}
         {(path === "/" ||
-        path === "/contact")
+        path === "/about")
         && (
         <OrbitRig 
           focused={props.focused}
@@ -82,7 +78,7 @@ export function ThreeDComponent (props: {
           setRadius={props.setRadius}
         />
         )}
-        {path === "/product" && (
+        {path.includes("/product") && (
         <>
         <MovingRig
           focused={props.focused}
@@ -145,25 +141,14 @@ export function ThreeDComponent (props: {
           />
           )}
         </EffectComposer>
-        {/* <Stats/> */}
+        <Stats/>
         <BakeShadows />
         <PerformanceMonitor onIncline={() => setDpr(1.5)} onDecline={() => setDpr(1)} />
         </Suspense>
       </Canvas>
+	  <Loader
+		containerStyles={{ backgroundColor: "var(--eerie-black)", color: "var(--eerie-black)"}}
+	  />
       </div>
   )
-}
-
-function VisbilityHandler({ path }: { path: string }) {
-  const state = useThree((state) => state);
-
-  useEffect(() => {
-    console.log(state);
-    state.setEvents({
-      filter: (intersections) =>
-        intersections.filter((i) => i.object.visible)
-    });
-}, [path]);
-  
-  return null
 }

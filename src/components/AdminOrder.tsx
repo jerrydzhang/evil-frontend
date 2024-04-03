@@ -8,7 +8,7 @@ const AdminOrder = (props: any) => {
     const [expanded, setExpanded] = React.useState(false);
     return (
     <div className="pb-5">
-        <p onClick={() => setExpanded(expanded => !expanded)}>{expanded? "Collapse":"Expanded"}</p>
+        <button className="btn" onClick={() => setExpanded(expanded => !expanded)}>{expanded? "Collapse":"Expand"}</button>
         <NavLink to={`/dashboard/${order.id}`}>{order.id}</NavLink>
         <p>{order.user_id}</p>
         {expanded && order.products.map((product: OrderItem) => (

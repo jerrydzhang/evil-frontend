@@ -58,7 +58,7 @@ type GLTFResult = GLTF & {
 };
 
 export function Model(props: JSX.IntrinsicElements["group"]) {
-  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "cityscape.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/cityscape.glb") as GLTFResult;
 
   for (const key in materials) {
     if (Object.prototype.hasOwnProperty.call(materials, key)) {
@@ -279,7 +279,7 @@ export function Model(props: JSX.IntrinsicElements["group"]) {
 
 export function TowerLight(props: JSX.IntrinsicElements["group"]) {
   const group = useRef<THREE.Group>(null!);
-  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "cityscape.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/cityscape.glb") as GLTFResult;
 
   // useMemo(() => {
   //   nodes.Sphere.material = materials["red light"];

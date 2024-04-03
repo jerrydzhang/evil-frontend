@@ -15,7 +15,7 @@ import { map } from "maath/dist/declarations/src/buffer";
 import { is } from "@react-three/fiber/dist/declarations/src/core/utils";
 
 type MuseumLoaderProps = JSX.IntrinsicElements['group'] & {
-  products: {[key: string]: Product[]};
+  products: Product[][];
   moveCamera: (e: any) => void;
   handleMouseMove: (e: any) => void;
 };
@@ -107,7 +107,7 @@ type GLTFResult = GLTF & {
 };
 
 export function MuseumScene({products, moveCamera, handleMouseMove, ...props }: MuseumLoaderProps) {
-  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "museum.glb") as GLTFResult;
+  const { nodes, materials } = useGLTF(process.env.PUBLIC_URL + "/museum.glb") as GLTFResult;
 
   return (
     <group {...props} dispose={null}>
@@ -479,56 +479,68 @@ export function MuseumScene({products, moveCamera, handleMouseMove, ...props }: 
 }
 
 type PictureFramesProps = JSX.IntrinsicElements['group'] & {
-  products: {[key: string]: Product[]};
+  products: Product[][];
   nodes: any;
   materials: any;
 }
 
 export function PictureFrames({ products, nodes, materials, ...props }: PictureFramesProps) {
-  if (Object.keys(products).length === 0) {
+  if (!products) {
     return null;
+  }
+
+  const getElementAtIndex = (index: number) => {
+	if (index >= products.length) {
+	  return undefined;
+	}
+
+	if (products[index].length === 0) {
+	  return undefined;
+	}
+
+	return products[index];
   }
 
   return (
     <group {...props} dispose={null}>
       <group position={[6, 3, 4.99]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[0]}
+          product={getElementAtIndex(0)}
           nodes={nodes} 
           materials={materials}
         />
       </group>
       <group position={[0, 3, 4.99]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[1]}
+          product={getElementAtIndex(1)}
           nodes={nodes} 
           materials={materials}
         />
       </group>
       <group position={[-6, 3, 4.99]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[2]}
+          product={getElementAtIndex(2)}
           nodes={nodes} 
           materials={materials}
         />
       </group>
       <group position={[-6, 3, -4.99]} rotation={[-Math.PI, 0, -Math.PI]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[3]}
+          product={getElementAtIndex(3)}
           nodes={nodes} 
           materials={materials}
         />
       </group>
       <group position={[0, 3, -4.99]} rotation={[-Math.PI, 0, -Math.PI]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[4]}
+          product={getElementAtIndex(4)}
           nodes={nodes} 
           materials={materials}
         />
       </group>
       <group position={[6, 3, -4.99]} rotation={[-Math.PI, 0, -Math.PI]}>
         <PictureFrame visible={props.visible}
-          product={Object.values(products)[5]}
+          product={getElementAtIndex(5)}
           nodes={nodes} 
           materials={materials}
         />
@@ -545,7 +557,7 @@ type PictureFrameProps = JSX.IntrinsicElements['group'] & {
 
 function PictureFrame({ product, nodes, materials, ...props }: PictureFrameProps) {
   const [active, setActive] = useState(false);
-  const [variant, setVariant] = useState<Size|undefined>(product && product[parseInt(Object.keys(product)[0])].variant_id);
+  const [variant, setVariant] = useState<Size|undefined>(product && product[0].variant_id);
 
   const [pointer, setPointer] = useState();
 
@@ -722,7 +734,7 @@ function ProductPicture({ imageURL, setActive, paintingPointerUp, paintingPointe
         map: img,
         side: THREE.DoubleSide,
       })
-    }
+	}
     rotation={[Math.PI*1.5, 0,  -Math.PI]}
     onPointerOver={() => {
       if (props.visible) setActive(true)

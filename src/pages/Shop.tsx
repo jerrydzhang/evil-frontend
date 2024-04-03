@@ -11,13 +11,21 @@ import ShopProduct from "../components/ShopProduct";
 import { Canvas } from "@react-three/fiber";
 import { Mesh } from "three";
 
-export function Shop({ products, setProducts, page, setPage }: { products: {[key: string]: Product[]}, setProducts: React.Dispatch<React.SetStateAction<{[key: string]: Product[]}>>, page: number, setPage: React.Dispatch<React.SetStateAction<number>>}) {
+interface ProductProps {
+	products: {[key: string]: Product[]};
+	setProducts: React.Dispatch<React.SetStateAction<{[key: string]: Product[]}>>;
+	page: number;
+	setPage: React.Dispatch<React.SetStateAction<number>>;
+	currentCategory: string | null;
+	setCurrentCategory: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+export function Shop({ products, setProducts, page, setPage, currentCategory, setCurrentCategory }: ProductProps) {
     const backendUrl = process.env.REACT_APP_BACKEND_URL!;
     const { user, isAuthenticated } = useAuth0();
+	const [categories, setCategories] = useState<string[]>([]);
 
     const location = useLocation();
-
-    const [currentCategory, setCurrentCategory] = useState<string | null>(null);
 
     const mapProducts = (products: Product[]) => {
         return products.reduce(function(map: any, product: Product) {
@@ -31,11 +39,20 @@ export function Shop({ products, setProducts, page, setPage }: { products: {[key
         }, {});
     }
 
+	useEffect(() => {
+		Axios.get(`${backendUrl}/api/product/category`)
+		.then((res) => {
+			setCategories(res.data as string[]);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+	}, []);
+
     useEffect(() => {
         if (currentCategory) {
             Axios.get(`${backendUrl}/api/product/active/category/${currentCategory}`)
             .then((res) => {
-                console.log(res);
                 const products = res.data as Product[];
                 setProducts(mapProducts(products));
             })
@@ -46,7 +63,6 @@ export function Shop({ products, setProducts, page, setPage }: { products: {[key
         } else {
             Axios.get(`${backendUrl}/api/product/active`)
             .then((res) => {
-                console.log(res);
                 const products = res.data as Product[];
                 setProducts(mapProducts(products));
             })
@@ -74,7 +90,7 @@ export function Shop({ products, setProducts, page, setPage }: { products: {[key
     }
 
     return (
-        <div className="shop-background">
+        <div className="shop-background" key={location.key}>
             <div className="flex flex-row flex-wrap mx-auto w-fit mt-4">
             {/* <h1>Shop</h1> */}
             {/* <div className={`category-selector ${currentCategory === null && 'active'} pointer-events-auto cursor-pointer h-fit w-auto whitespace-nowrap overflow-hidden py-2 px-6 text-ms text-center rounded-md`} onClick={() => getCategory("all")}>
@@ -87,8 +103,9 @@ export function Shop({ products, setProducts, page, setPage }: { products: {[key
             t-shirt
             </div> */}
             <CategorySelector category="all" currentCategory={currentCategory} getCategory={getCategory} />
-            <CategorySelector category="pants" currentCategory={currentCategory} getCategory={getCategory} />
-            <CategorySelector category="t-shirt" currentCategory={currentCategory} getCategory={getCategory} />
+			{categories.map((category) => {
+				return <CategorySelector category={category} currentCategory={currentCategory} getCategory={getCategory} />
+			})}
             </div>
             <div className="flex flex-row items-center mx-auto w-fit mt-4 gap-2">
                 {page > 1 ?
@@ -101,7 +118,6 @@ export function Shop({ products, setProducts, page, setPage }: { products: {[key
                 <img src="/icons/left_arrow_icon.svg" className="size-7 rotate-180"></img></button> 
                 :<div className="size-7"></div>}
             </div>
-            <PrivacyScreen />
         </div>
     );
 }

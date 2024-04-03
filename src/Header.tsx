@@ -62,12 +62,12 @@ export function Header({cart, reduced, home, setHome, focused, setFocused, focus
                 animate={reduced ? "closed" : "open"}
                 variants={variants}
             >
-                <button className={`header-nav ${location.pathname === "/product" && "active"} z-10`}
+                <button className={`header-nav ${location.pathname.includes("/product") && "active"} z-10`}
                 onClick={() => pageTransition(location.pathname, pos3, false, navigate, setFocused, setFocus, cameraPosition, setCameraPosition, "/product")}
                 >Shop</button>
-                <button className={`header-nav ${location.pathname === "/contact" && "active"} z-10`}
-                onClick={() => pageTransition(location.pathname, pos3, false, navigate, setFocused, setFocus, cameraPosition, setCameraPosition, "/contact")}
-                >Contact</button>
+                <button className={`header-nav ${location.pathname === "/about" && "active"} z-10`}
+                onClick={() => pageTransition(location.pathname, pos3, false, navigate, setFocused, setFocus, cameraPosition, setCameraPosition, "/about")}
+                >About</button>
             </motion.nav>
         </div>
         <div className="flex items-center ml-auto space-x-4">

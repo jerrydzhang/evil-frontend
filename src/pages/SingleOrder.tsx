@@ -28,6 +28,7 @@ export function SingleOrder() {
             <div className="pb-5">
                 <p>{order.id}</p>
                 <p>{order.user_id}</p>
+				<p>Total: {order.products.reduce((acc, product) => acc + product.product.price * product.quantity, 0)}</p>
                 {order.products.map((product: OrderItem) => (
                     <div>
                         <p>{product.product.id}</p>
@@ -36,15 +37,8 @@ export function SingleOrder() {
                     </div>
                 ))}
                 <p>{order.status}</p>
-                <p>{order.updated_at}</p>
-                <p>{order.created_at}</p>
-                <select defaultValue={order.status}>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delievered">Delievered</option>
-                    <option value="canceled">Canceled</option>
-                    <option value="returned">Returned</option>
-                </select>
+                <p>Last Updated: {new Date(order.updated_at).toLocaleDateString()}</p>
+                <p>Placed At: {new Date(order.created_at).toLocaleDateString()}</p>
             </div>
             )}
         </div>

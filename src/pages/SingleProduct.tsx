@@ -29,7 +29,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
         .then((res) => {
             console.log(res);
             const product = res.data as Product[];
-            setProducts(product);
+            setProducts(product.sort((a: Product, b: Product) => a.variant_id - b.variant_id));
             if (size === undefined) {
                 const productsWithInventory = product.filter((product: Product) => product.inventory > 0);
                 setSize(productsWithInventory[0].variant_id);
@@ -42,7 +42,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
 
     if (!products) {
         return (
-            <PrivacyScreen />
+			<div className='product-page-container'/>
         );
     }
 
@@ -61,19 +61,6 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
             }
             cartClone[productId] = cart[productId] + quantity || quantity;
             setCart(cartClone);
-            // if (isAuthenticated) {
-            //     Axios.post(`${backendUrl}/api/cart/update`, {
-            //         user_id: user?.sub,
-            //         product_id: productId,
-            //         quantity: cartClone[productId]
-            //     }, { withCredentials: true})
-            //     .then((res) => {
-            //         console.log(res);
-            //     })
-            //     .catch((err) => {
-            //         console.log(err);
-            //     });
-            // }
         // if cart doesn't exist, create it
         } else {
             if (quantity > product.inventory) {
@@ -81,19 +68,6 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
             }
             cartClone[productId] = quantity;
             setCart(cartClone);
-            // if (isAuthenticated) {
-            //     Axios.post(`${backendUrl}/api/cart/add`, {
-            //         user_id: user?.sub,
-            //         product_id: productId,
-            //         quantity: cartClone[productId]
-            //     }, { withCredentials: true })
-            //     .then((res) => {
-            //         console.log(res);
-            //     })
-            //     .catch((err) => {
-            //         console.log(err);
-            //     });
-            // }
         }
     }
 
@@ -109,7 +83,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
 
     return (
         <div className='product-page-container'>
-            <button className='btn back-button' onClick={() => navigate("/product")}>
+            <button className='btn back-button' onClick={() => navigate("/product", { state: {previousWindow: location.pathname}})}>
                 Back
                 {/* <img className='size-12' src='/icons/left_arrow_icon.svg' alt='back-arrow' /> */}
             </button>
@@ -161,7 +135,6 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
                     </div>
                 </div>
             ))}
-            <PrivacyScreen />
         </div>
     );
 }
