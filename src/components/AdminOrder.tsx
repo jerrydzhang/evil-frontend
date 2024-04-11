@@ -16,7 +16,7 @@ const AdminOrder = (props: any) => {
                 <p>{product.product.id}</p>
                 <p>{product.product.name}</p>
                 <p>Quantity: {product.quantity}</p>
-                <p>Variant: {Size[product.product.variant_id]}</p>
+                <p>Variant: {product.product.variant_id}</p>
             </div>
         ))}
         <p>{order.status}</p>

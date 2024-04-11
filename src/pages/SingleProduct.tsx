@@ -6,6 +6,7 @@ import { NavLink, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Product, Size } from '../common/types';
 import { PrivacyScreen } from '../components/PrivacyScreen';
 import { useAuth0 } from '@auth0/auth0-react';
+import { ShirtSizing } from '../components/singleplugnplay/ShirtSizing';
 
 type SingleProductProps = {
     cart: {[key: string]: number};
@@ -19,7 +20,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
     const location = useLocation();
     const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>();
-    const [size, setSize] = useState<Size>(location.state ? location.state.size : undefined);
+    const [variant, setVariant] = useState<number>(location.state ? location.state.size : undefined);
     const [image, setImage] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(1);
 
@@ -30,9 +31,9 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
             console.log(res);
             const product = res.data as Product[];
             setProducts(product.sort((a: Product, b: Product) => a.variant_id - b.variant_id));
-            if (size === undefined) {
+            if (variant === undefined) {
                 const productsWithInventory = product.filter((product: Product) => product.inventory > 0);
-                setSize(productsWithInventory[0].variant_id);
+                setVariant(productsWithInventory[0].variant_id);
             }
         })
         .catch((err) => {
@@ -48,7 +49,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
 
     const addToCart = (n: number) => {
         let cartClone = {...cart};
-        const productId = products.find((product: Product) => product.variant_id === size)!.id;
+        const productId = products.find((product: Product) => product.variant_id === variant)!.id;
         const product = products.find((product) => product.id === productId);
         const quantity = n || 1;
         if (!product) {
@@ -85,12 +86,12 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
         <div className='product-page-container'>
             <button className='btn back-button' onClick={() => navigate("/product", { state: {previousWindow: location.pathname}})}>
                 Back
-                {/* <img className='size-12' src='/icons/left_arrow_icon.svg' alt='back-arrow' /> */}
+                {/* <img className='variant-12' src='/icons/left_arrow_icon.svg' alt='back-arrow' /> */}
             </button>
             {products
             .filter((product: Product) => {
-                if (size !== undefined) {
-                    return product.variant_id === size;
+                if (variant !== undefined) {
+                    return product.variant_id === variant;
                 }
             })
             .map((product: Product) => (
@@ -106,10 +107,7 @@ export function SingleProduct({ cart, setCart }: SingleProductProps) {
                         </div>
                     </div>
                     <div className='sizing-container'>
-                        <button className={`size-button ${!products.some((product: Product) => product.variant_id === Size.S && product.inventory > 0) && 'unavailable'} ${size === Size.S && 'active'}`} onClick={() => setSize(Size.S)}>S</button>
-                        <button className={`size-button ${!products.some((product: Product) => product.variant_id === Size.M && product.inventory > 0) && 'unavailable'} ${size === Size.M && 'active'}`} onClick={() => setSize(Size.M)}>M</button>
-                        <button className={`size-button ${!products.some((product: Product) => product.variant_id === Size.L && product.inventory >0) && 'unavailable'} ${size === Size.L && 'active'}`} onClick={() => setSize(Size.L)}>L</button>
-                        <button className={`size-button ${!products.some((product: Product) => product.variant_id === Size.XL && product.inventory > 0) && 'unavailable'} ${size === Size.XL && 'active'}`} onClick={() => setSize(Size.XL)}>XL</button>
+					<ShirtSizing products={products} variant={variant} setVariant={setVariant} />
                     </div>
                     <div className='left-container'>
                         <div className='discription-container'>

@@ -44,7 +44,7 @@ const Order = ({ order }: OrderProps) => {
                         <div className="">
                         <img className="size-32" src={product.product.images[0]} alt={product.product.name} />
                         <p>Quantity: {product.quantity}</p>
-                        <p>Size: {Size[product.product.variant_id]}</p>
+                        <p>Size: {product.product.variant_id}</p>
                         </div>
                     </div>
                 ))}

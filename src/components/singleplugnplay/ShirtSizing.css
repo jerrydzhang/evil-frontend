@@ -1,0 +1,24 @@
+
+.size-button {
+    background-color: var(--eerie-black);
+    border: 1px solid var(--white);
+    width: 42px;
+    height: 42px;
+    border-radius: 0.25rem;
+    color: var(--white);
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0.25rem;
+    transition: all 0.2s ease-in-out;
+    &.unavailable {
+        cursor: auto;
+        pointer-events: none;
+        opacity: 0.3;
+    }
+    &.active {
+        background-color: var(--tekhelet);
+        border: 1px solid var(--tekhelet);
+        color: var(--white);
+    }
+}

@@ -677,7 +677,7 @@ function PictureFrame({ product, nodes, materials, ...props }: PictureFrameProps
         {/* <a href={`/product/${product[variant].name}`} className="text-xl" >{product[variant].name}</a> */}
         <p className="text-xl">{product[variant].name}</p>
         <p className="text-xl">${product[variant].price}</p>
-        <div className="flex">
+        {/* <div className="flex">
           <p className="">Sizes:</p>
         {Object.keys(product).map((variant_id: string) => {
           if (product[+variant_id].inventory === 0) {
@@ -690,7 +690,7 @@ function PictureFrame({ product, nodes, materials, ...props }: PictureFrameProps
             </div>
           )
         })}
-        </div>
+        </div> */}
       </div>
     </Html>
     )}

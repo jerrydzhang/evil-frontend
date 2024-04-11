@@ -17,7 +17,7 @@ const DashboardProduct = (
 
     const [title, setTitle] = useState<string>(product.name);
     const [description, setDescription] = useState<string>(product.description);
-    const [inventoryChange, setInventoryChange] = useState<number>(product.inventory);
+    const [inventoryChange, setInventoryChange] = useState<number>(0);
     const [active, setActive] = useState<boolean>(product.active);
 
     const [images, setImages] = useState<string[]>(product.images);
